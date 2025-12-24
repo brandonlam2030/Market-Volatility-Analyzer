@@ -20,16 +20,20 @@ returns = np.log(close_df/close_df.shift(1))
 returns.dropna(inplace = True)
 
 
-mean = returns.mean()
+rolling_vol = returns.rolling(21).std()
+rolling_vol.dropna(inplace=True)
 
-stability = abs(returns-mean)
+rolling_mean = rolling_vol.mean()
+unstable = rolling_vol.gt(rolling_mean, axis = 1)
 
-num_unstable = len(stability[stability["SPY"] > .01])
-print(num_unstable/len(stability["SPY"])*100)
+unstable_ratio = unstable.mean()
+print("Instability Ratios\n" + (unstable_ratio*100).to_string())
 
 
 
-plt.subplot(1,2,2)
-plt.plot(returns)
-plt.title("Returns Per Day")
+
+
+plt.plot(rolling_vol, lw = 3)
+plt.legend(tickers)
+plt.title("Rolling Volatility Over the Year")
 plt.show()
